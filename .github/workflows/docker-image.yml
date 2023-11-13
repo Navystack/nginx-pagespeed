@@ -28,7 +28,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: navystack/nginx-pagespeed:workflows-test
+          tags: |
+            navystack/nginx-pagespeed:1.25.3
+            navystack/nginx-pagespeed:latest
+            navystack/nginx-pagespeed:mainline
+            navystack/nginx-pagespeed:dev
           platforms: |
             linux/amd64
             linux/arm64
