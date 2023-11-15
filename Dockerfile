@@ -19,7 +19,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 WORKDIR /opt/build-stage
 RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 
-# AMD64 아키텍처
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
     wget http://www.tiredofit.nl/psol-${PSOL}.tar.xz && \
     git clone --depth=1 https://github.com/apache/incubator-pagespeed-ngx.git && \
@@ -28,7 +27,6 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     tar zxvf nginx-${NGINX_VERSION}.tar.gz; \
     fi
 
-# ARM64 아키텍처
 ARG ARCH=arm64
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
     wget https://gitlab.com/gusco/ngx_pagespeed_arm/-/raw/master/psol-1.15.0.0-aarch64.tar.gz && \
