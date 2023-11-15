@@ -15,8 +15,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         libpcre3 \
         libpcre3-dev \
         unzip uuid-dev && \
-    mkdir -p /opt/build-pagespeed
-WORKDIR /opt/build-pagespeed
+    mkdir -p /opt/build-stage
+WORKDIR /opt/build-stage
 RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 
 # AMD64 아키텍처
@@ -46,5 +46,5 @@ RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx &&
     make modules
 
 FROM nginx:${NGINX_VERSION} as final
-COPY --from=builder /opt/build-pagespeed/nginx-${NGINX_VERSION}/objs/ngx_pagespeed.so /usr/lib/nginx/modules/
+COPY --from=builder /opt/build-stage/nginx-${NGINX_VERSION}/objs/ngx_pagespeed.so /usr/lib/nginx/modules/
 COPY nginx.conf /etc/nginx/nginx.conf
