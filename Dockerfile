@@ -46,7 +46,6 @@ RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx &&
 FROM nginx:${NGINX_VERSION} as final
 COPY --from=builder /opt/build-stage/nginx-${NGINX_VERSION}/objs/ngx_pagespeed.so /usr/lib/nginx/modules/
 run cat <<EOF > /etc/nginx/conf.d/default.conf
-load_module "modules/ngx_pagespeed.so";
 
 user nginx;
 worker_processes auto;
@@ -59,6 +58,7 @@ events {
 }
 
 http {
+    load_module "modules/ngx_pagespeed.so";
     pagespeed on;
     pagespeed FileCachePath "/var/run/ngx_pagespeed/";
 
