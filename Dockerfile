@@ -27,7 +27,6 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     tar zxvf nginx-${NGINX_VERSION}.tar.gz; \
     fi
 
-ARG ARCH=arm64
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
     wget https://gitlab.com/gusco/ngx_pagespeed_arm/-/raw/master/psol-1.15.0.0-aarch64.tar.gz && \
     git clone --depth=1 https://github.com/apache/incubator-pagespeed-ngx.git && \
@@ -46,7 +45,9 @@ RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx &&
 FROM nginx:${NGINX_VERSION} as final
 COPY --from=builder /opt/build-stage/nginx-${NGINX_VERSION}/objs/ngx_pagespeed.so /usr/lib/nginx/modules/
 run mkdir -p /var/run/ngx_pagespeed_cache && \
+    mkdir -p /var/run/nginx-cache && \
     chown www-data:www-data /var/run/ngx_pagespeed_cache && \
+    chown www-data:www-data /var/run/nginx-cache && \
     cat <<EOF > /etc/nginx/nginx.conf
 user nginx;
 worker_processes auto;
@@ -79,7 +80,7 @@ http {
     pagespeed standby;
     pagespeed FileCachePath /var/run/ngx_pagespeed_cache;
     pagespeed XHeaderValue "";
-    
+
     include /etc/nginx/conf.d/*.conf;
 }
 EOF
