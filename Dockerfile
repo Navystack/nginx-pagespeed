@@ -55,7 +55,6 @@ error_log /var/log/nginx/error.log notice;
 pid /var/run/nginx.pid;
 
 load_module "modules/ngx_pagespeed.so";
-pagespeed FileCachePath /var/cache/nginx/ngx_pagespeed_cache;
 
 events {
     worker_connections 1024;
@@ -77,7 +76,7 @@ http {
     keepalive_timeout 65;
 
     # gzip on;
-
+    pagespeed FileCachePath /var/cache/nginx/ngx_pagespeed_cache;
     include /etc/nginx/conf.d/*.conf;
 }
 EOF
