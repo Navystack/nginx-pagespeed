@@ -76,7 +76,10 @@ http {
     keepalive_timeout 65;
 
     # gzip on;
+    pagespeed standby;
     pagespeed FileCachePath /var/run/ngx_pagespeed_cache;
+    pagespeed XHeaderValue "";
+    
     include /etc/nginx/conf.d/*.conf;
 }
 EOF
