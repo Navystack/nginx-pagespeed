@@ -45,8 +45,8 @@ RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx &&
 
 FROM nginx:${NGINX_VERSION} as final
 COPY --from=builder /opt/build-stage/nginx-${NGINX_VERSION}/objs/ngx_pagespeed.so /usr/lib/nginx/modules/
-run mkdir -p /var/cache/nginx/ngx_pagespeed_cache && \
-    chown www-data:www-data /var/cache/nginx/ngx_pagespeed_cache && \
+run mkdir -p /var/run/ngx_pagespeed_cache && \
+    chown www-data:www-data /var/run/ngx_pagespeed_cache && \
     cat <<EOF > /etc/nginx/nginx.conf
 user nginx;
 worker_processes auto;
@@ -76,7 +76,7 @@ http {
     keepalive_timeout 65;
 
     # gzip on;
-    pagespeed FileCachePath /var/cache/nginx/ngx_pagespeed_cache;
+    pagespeed FileCachePath /var/run/ngx_pagespeed_cache;
     include /etc/nginx/conf.d/*.conf;
 }
 EOF
