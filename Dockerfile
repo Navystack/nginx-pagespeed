@@ -46,46 +46,35 @@ RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx &&
 FROM nginx:${NGINX_VERSION} as final
 COPY --from=builder /opt/build-stage/nginx-${NGINX_VERSION}/objs/ngx_pagespeed.so /usr/lib/nginx/modules/
 run cat <<EOF > /etc/nginx/nginx.conf
-load_module "modules/ngx_pagespeed.so";
+    load_module "modules/ngx_pagespeed.so";
 
-user nginx;
-worker_processes auto;
+    user nginx;
+    worker_processes auto;
 
-error_log /var/log/nginx/error.log notice;
-pid /var/run/nginx.pid;
+    error_log /var/log/nginx/error.log notice;
+    pid /var/run/nginx.pid;
 
-events {
-    worker_connections 1024;
-}
+    events {
+        worker_connections 1024;
+    }
 
-http {
-    pagespeed on;
-    pagespeed FileCachePath "/var/run/ngx_pagespeed/";
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
 
-    pagespeed Statistics on;
-    pagespeed StatisticsLogging on;
-    pagespeed LogDir "/var/log/pagespeed";
-    pagespeed StatisticsLoggingIntervalMs 60000;
-    pagespeed StatisticsLoggingMaxFileSizeKb 1024;
+        log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                        '\$status \$body_bytes_sent "\$http_referer" '
+                        '"\$http_user_agent" "\$http_x_forwarded_for"';
 
-    pagespeed RewriteLevel CoreFilters;
+        access_log /var/log/nginx/access.log main;
 
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
+        sendfile on;
+        tcp_nopush on;
 
-    log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
-                    '\$status \$body_bytes_sent "\$http_referer" '
-                    '"\$http_user_agent" "\$http_x_forwarded_for"';
+        keepalive_timeout 65;
 
-    access_log /var/log/nginx/access.log main;
+        # gzip on;
 
-    sendfile on;
-    tcp_nopush on;
-
-    keepalive_timeout 65;
-
-    # gzip on;
-
-    include /etc/nginx/conf.d/*.conf;
-}
-EOF
+        include /etc/nginx/conf.d/*.conf;
+    }
+    EOF
