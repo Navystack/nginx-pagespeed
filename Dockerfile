@@ -45,14 +45,17 @@ RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx &&
 
 FROM nginx:${NGINX_VERSION} as final
 COPY --from=builder /opt/build-stage/nginx-${NGINX_VERSION}/objs/ngx_pagespeed.so /usr/lib/nginx/modules/
-run cat <<EOF > /etc/nginx/nginx.conf
-load_module "modules/ngx_pagespeed.so";
-
+run mkdir -p /var/cache/nginx/ngx_pagespeed_cache && \
+    chown www-data:www-data /var/cache/nginx/ngx_pagespeed_cache && \
+    cat <<EOF > /etc/nginx/nginx.conf
 user nginx;
 worker_processes auto;
 
 error_log /var/log/nginx/error.log notice;
 pid /var/run/nginx.pid;
+
+load_module "modules/ngx_pagespeed.so";
+pagespeed FileCachePath /var/cache/nginx/ngx_pagespeed_cache;
 
 events {
     worker_connections 1024;
