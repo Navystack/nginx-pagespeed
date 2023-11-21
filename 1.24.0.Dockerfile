@@ -1,4 +1,4 @@
-ARG NGINX_VERSION=1.25.3
+ARG NGINX_VERSION=1.24.0
 FROM nginx:${NGINX_VERSION} as builder
 ARG TARGETARCH
 ARG PSOL=jammy
@@ -39,7 +39,7 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     tar zxvf nginx-${NGINX_VERSION}.tar.gz; \
     fi
 
-WORKDIR nginx-${NGINX_VERSION}
+WORKDIR /opt/build-stage/nginx-${NGINX_VERSION}
 RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx && \
     make modules
 
@@ -49,39 +49,4 @@ run mkdir -p /var/run/ngx_pagespeed_cache && \
     mkdir -p /var/run/nginx-cache && \
     chown www-data:www-data /var/run/ngx_pagespeed_cache && \
     chown www-data:www-data /var/run/nginx-cache && \
-    cat <<EOF > /etc/nginx/nginx.conf
-user nginx;
-worker_processes auto;
-
-error_log /var/log/nginx/error.log notice;
-pid /var/run/nginx.pid;
-
-load_module "modules/ngx_pagespeed.so";
-
-events {
-    worker_connections 1024;
-}
-
-http {
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-
-    log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
-                    '\$status \$body_bytes_sent "\$http_referer" '
-                    '"\$http_user_agent" "\$http_x_forwarded_for"';
-
-    access_log /var/log/nginx/access.log main;
-
-    sendfile on;
-    tcp_nopush on;
-
-    keepalive_timeout 65;
-
-    # gzip on;
-    pagespeed standby;
-    pagespeed FileCachePath /var/run/ngx_pagespeed_cache;
-    pagespeed XHeaderValue "";
-
-    include /etc/nginx/conf.d/*.conf;
-}
-EOF
+    echo "load_module modules/ngx_pagespeed.so;\n$(cat /etc/nginx/nginx.conf)" > /etc/nginx/nginx.conf
