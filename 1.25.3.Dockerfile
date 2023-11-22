@@ -8,17 +8,20 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     xz-utils \
     git \
-    build-essential \
     zlib1g-dev \
     libpcre3 \
     libpcre3-dev \
-    unzip uuid-dev && \
+    unzip \
+    uuid-dev \
+    openssl \
+    libssl-dev \
+    libbrotli-dev && \
     mkdir -p /opt/build-stage
 WORKDIR /opt/build-stage
 RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
-    wget http://www.tiredofit.nl/psol-${PSOL}.tar.xz && \
+    wget https://www.tiredofit.nl/psol-${PSOL}.tar.xz && \
     git clone --depth=1 https://github.com/apache/incubator-pagespeed-ngx.git && \
     tar xvf psol-${PSOL}.tar.xz && \
     mv psol incubator-pagespeed-ngx && \
@@ -36,7 +39,7 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     tar zxvf nginx-${NGINX_VERSION}.tar.gz; \
     fi
 
-WORKDIR nginx-${NGINX_VERSION}
+WORKDIR /opt/build-stage/nginx-${NGINX_VERSION}
 RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx && \
     make
 
