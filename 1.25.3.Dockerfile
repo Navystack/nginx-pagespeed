@@ -39,7 +39,7 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     tar zxvf nginx-${NGINX_VERSION}.tar.gz; \
     fi
 
-WORKDIR /opt/build-stage/nginx-${NGINX_VERSION}
+WORKDIR nginx-${NGINX_VERSION}
 RUN ./configure --with-compat --add-dynamic-module=../incubator-pagespeed-ngx && \
     make modules
 
