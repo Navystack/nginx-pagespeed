@@ -2,20 +2,17 @@ ARG NGINX_VERSION=1.24.0
 FROM nginx:${NGINX_VERSION} as builder
 ARG TARGETARCH
 ARG PSOL=jammy
-RUN     \
-        --mount=type=cache,target=/var/cache/apt,sharing=locked \
-        --mount=type=cache,target=/var/lib/apt,sharing=locked \
-        apt-get update && apt-get install -y \
-        wget \
-        tar \
-        build-essential \
-        xz-utils \
-        git \
-        build-essential \
-        zlib1g-dev \
-        libpcre3 \
-        libpcre3-dev \
-        unzip uuid-dev && \
+RUN apt-get update && apt-get install -y \
+    wget \
+    tar \
+    build-essential \
+    xz-utils \
+    git \
+    build-essential \
+    zlib1g-dev \
+    libpcre3 \
+    libpcre3-dev \
+    unzip uuid-dev && \
     mkdir -p /opt/build-stage
 WORKDIR /opt/build-stage
 RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
